@@ -1,32 +1,37 @@
 import { Router } from 'express'
+import { fetchTables } from '../services/data.service.js'
 
 const requestRouter = Router()
 
-// crear la solicitud
+// create the request
 requestRouter.post('/', function(req, res) {
   res.json(req.body)
 })
 
-// listar las solicitudes que tiene la empresa
-requestRouter.get('/company/:companyId', function(req, res) {
+// requests made by a company
+requestRouter.get('/company/:companyId', async function(req, res) {
   const { companyId } = req.params
-  res.json({ "company_id": companyId })
+
+  const requests = await fetchTables('requests', 'company_id', companyId) 
+  res.json(requests)
 })
 
-// listar las solicitudes hechas por la organizacion
-requestRouter.get('/organization/:organizationId', function(req, res) {
+// requests made by an organization
+requestRouter.get('/organization/:organizationId', async function(req, res) {
   const { organizationId } = req.params
-  res.json({ "organization_id": organizationId })
+
+  const requests = await fetchTables('requests', 'organization_id', organizationId) 
+  res.json(requests)
 })
 
-// aceptar la solicitud y crear una reserva automaticamente
-// disparar llamada al catalog service
+// accepts the request and creates a new request automatically
+// call catalog service
 requestRouter.patch('/:requestId/accept', function(req, res) {
   const { requestId } = req.params
   res.json({ "requestId": requestId, "state": "accepted" }) // colocar la reserva entera
 })
 
-// rechazar la solicitud
+// reject request
 requestRouter.patch('/:requestId/deny', function(req, res) {
   const { requestId } = req.params
   res.json({ "requestId": requestId, "state": "denied" })

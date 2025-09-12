@@ -1,8 +1,11 @@
 import pgPromise from 'pg-promise'
+import dotenv from 'dotenv'
 
-const DATABASE_URL = proces.env.URL_DATABASE
+dotenv.config()
+
+const DATABASE_URL = process.env.URL_DATABASE
 const pgp = pgPromise()
 
-const db = pgp(DATABASE_URL)
+const database = pgp(DATABASE_URL)
 
-export default db;
+export default database;
