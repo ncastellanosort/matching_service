@@ -28,7 +28,8 @@ export async function fetchOneRecord(tableName, idName ,idValue) {
   }
 }
 
-export async function createReservation(request_id, surplus_id, company_id, organization_id, reserved_at, status) {
+export async function createReservation(table) {
+    const { request_id, surplus_id, company_id, organization_id, created_at, request_status } = table
   try {
     const query = `
     INSERT INTO reservations(
@@ -41,7 +42,7 @@ export async function createReservation(request_id, surplus_id, company_id, orga
     ) VALUES ($1, $2, $3, $4, $5, $6)
     RETURNING *
   `
-   return await database.one(query, [request_id, surplus_id, company_id, organization_id, reserved_at, status])
+   return await database.one(query, [request_id, surplus_id, company_id, organization_id, created_at, request_status])
   } catch(e) {
     console.log(`err creating reservation: ${e}`)
   }
@@ -57,10 +58,9 @@ export async function modifyStatus(tableName, id, status, modify) {
     })
 
     const table = await fetchOneRecord('requests', 'request_id', id)
-    const { request_id, surplus_id, company_id, organization_id, created_at, request_status } = table
 
     if (modify) {
-      return await createReservation(request_id, surplus_id, company_id, organization_id, created_at, request_status)
+      return await createReservation(table)
     }
   } catch(e) {
     console.log(`err accepting request tables: ${e}`)
