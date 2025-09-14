@@ -1,14 +1,20 @@
 import { Router } from 'express'
-import { fetchTables } from '../services/data.service.js'
+import { fetchTables, modifyStatus } from '../services/data.service.js'
 
 const requestRouter = Router()
 
-// create the request
+// get a catalog_service para traer todo los excedentes publicados por las empresas
+
+// la organization crea una solicitud
 requestRouter.post('/', function(req, res) {
-  res.json(req.body)
+  const todayDate = new Date().toISOString()
+  const newProps = { "request_status": "pending", "created_at": todayDate }
+
+  const formattedResponse = Object.assign(req.body, newProps)
+  res.json(formattedResponse)
 })
 
-// requests made by a company
+// empresa revisa las solicitudes que tiene
 requestRouter.get('/company/:companyId', async function(req, res) {
   const { companyId } = req.params
 
@@ -16,25 +22,19 @@ requestRouter.get('/company/:companyId', async function(req, res) {
   res.json(requests)
 })
 
-// requests made by an organization
-requestRouter.get('/organization/:organizationId', async function(req, res) {
-  const { organizationId } = req.params
+// actualizan el estado de la solicitud de la empresa
+requestRouter.patch('/:requestId/accept', async function(req, res) {
+  const { requestId } = req.params
+  const requests = await modifyStatus('requests', requestId, 'accepted')
 
-  const requests = await fetchTables('requests', 'organization_id', organizationId) 
   res.json(requests)
 })
 
-// accepts the request and creates a new request automatically
-// call catalog service
-requestRouter.patch('/:requestId/accept', function(req, res) {
+requestRouter.patch('/:requestId/reject', async function(req, res) {
   const { requestId } = req.params
-  res.json({ "requestId": requestId, "state": "accepted" }) // colocar la reserva entera
-})
+  const requests = await modifyStatus('requests', requestId, 'rejected')
 
-// reject request
-requestRouter.patch('/:requestId/deny', function(req, res) {
-  const { requestId } = req.params
-  res.json({ "requestId": requestId, "state": "denied" })
+  res.json(requests)
 })
 
 export default requestRouter;

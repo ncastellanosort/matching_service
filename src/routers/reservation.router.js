@@ -3,7 +3,7 @@ import { fetchTables } from '../services/data.service.js'
 
 const reservationRouter = Router()
 
-// reservations for each one
+// empresa consulta sus reservas
 reservationRouter.get('/company/:companyId', async function(req, res) {
   const { companyId } = req.params
 
@@ -11,6 +11,7 @@ reservationRouter.get('/company/:companyId', async function(req, res) {
   res.json(requests)
 })
 
+// organizacion consulta sus reservas
 reservationRouter.get('/organization/:organizationId', async function(req, res) {
   const { organizationId } = req.params
 

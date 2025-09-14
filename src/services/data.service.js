@@ -10,8 +10,22 @@ export async function fetchTables(tableName, idName ,idValue) {
     });
     return requests;
   } catch(e) {
-    console.log('err fetching requests from db')
+    console.log(`err fetching tables: ${e}`)
   }
 }
 
+export async function modifyStatus(tableName, id, status) {
+  try {
+    const query = 'UPDATE ${table:name} SET request_status = ${newStatus} WHERE request_id = ${idVal}'
+    await database.none(query, {
+      table: tableName,
+      newStatus: status,
+      idVal: id
+    })
 
+    return await fetchTables('requests', 'request_id', id)
+
+  } catch(e) {
+    console.log(`err accepting request tables: ${e}`)
+  }
+}

@@ -9,3 +9,4 @@ const pgp = pgPromise()
 const database = pgp(DATABASE_URL)
 
 export default database;
+
