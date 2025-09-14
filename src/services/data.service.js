@@ -67,3 +67,23 @@ export async function modifyStatus(tableName, id, status, modify) {
   }
 }
 
+export async function saveRequest(body) {
+  try {
+    const query = `INSERT INTO requests(
+      surplus_id,
+      company_id,
+      organization_id,
+      message,
+      request_status,
+      created_at
+    ) VALUES ($1, $2, $3, $4, $5, $6)
+    RETURNING *
+    `
+    const { surplus_id, company_id, organization_id, message } = body
+
+    const todayDate = new Date().toISOString()
+    return await database.one(query, [surplus_id, company_id, organization_id, message, "pending", todayDate])
+  } catch(e){
+    console.log(`err saving request: ${e}`)
+  } 
+}

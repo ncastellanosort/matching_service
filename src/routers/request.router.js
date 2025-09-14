@@ -1,17 +1,14 @@
 import { Router } from 'express'
-import { fetchArrayOfRecords, modifyStatus } from '../services/data.service.js'
+import { fetchArrayOfRecords, modifyStatus, saveRequest } from '../services/data.service.js'
 
 const requestRouter = Router()
 
 // get a catalog_service para traer todo los excedentes publicados por las empresas
 
 // la organization crea una solicitud
-requestRouter.post('/', function(req, res) {
-  const todayDate = new Date().toISOString()
-  const newProps = { "request_status": "pending", "created_at": todayDate }
-
-  const formattedResponse = Object.assign(req.body, newProps)
-  res.json(formattedResponse)
+requestRouter.post('/', async function(req, res) {
+  const postResponse = await saveRequest(req.body)
+  res.json(postResponse)
 })
 
 // empresa revisa las solicitudes que tiene
