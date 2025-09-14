@@ -1,5 +1,5 @@
 import { Router } from 'express'
-import { fetchTables, modifyStatus } from '../services/data.service.js'
+import { fetchArrayOfRecords, modifyStatus } from '../services/data.service.js'
 
 const requestRouter = Router()
 
@@ -18,21 +18,21 @@ requestRouter.post('/', function(req, res) {
 requestRouter.get('/company/:companyId', async function(req, res) {
   const { companyId } = req.params
 
-  const requests = await fetchTables('requests', 'company_id', companyId) 
+  const requests = await fetchArrayOfRecords('requests', 'company_id', companyId) 
   res.json(requests)
 })
 
 // actualizan el estado de la solicitud de la empresa
 requestRouter.patch('/:requestId/accept', async function(req, res) {
   const { requestId } = req.params
-  const requests = await modifyStatus('requests', requestId, 'accepted')
+  const requests = await modifyStatus('requests', requestId, 'accepted', true)
 
   res.json(requests)
 })
 
 requestRouter.patch('/:requestId/reject', async function(req, res) {
   const { requestId } = req.params
-  const requests = await modifyStatus('requests', requestId, 'rejected')
+  const requests = await modifyStatus('requests', requestId, 'rejected', false)
 
   res.json(requests)
 })

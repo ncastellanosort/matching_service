@@ -1,6 +1,6 @@
 import database from '../db/db.js'
 
-export async function fetchTables(tableName, idName ,idValue) {
+export async function fetchArrayOfRecords(tableName, idName ,idValue) {
   try {
     const query = 'SELECT * FROM ${table:name} WHERE ${idCol:name} = ${idVal}';
     const requests = await database.any(query, {
@@ -14,7 +14,40 @@ export async function fetchTables(tableName, idName ,idValue) {
   }
 }
 
-export async function modifyStatus(tableName, id, status) {
+export async function fetchOneRecord(tableName, idName ,idValue) {
+  try {
+    const query = 'SELECT * FROM ${table:name} WHERE ${idCol:name} = ${idVal}';
+    const requests = await database.oneOrNone(query, {
+      table: tableName,
+      idCol: idName,
+      idVal: idValue
+    });
+    return requests;
+  } catch(e) {
+    console.log(`err fetching tables: ${e}`)
+  }
+}
+
+export async function createReservation(request_id, surplus_id, company_id, organization_id, reserved_at, status) {
+  try {
+    const query = `
+    INSERT INTO reservations(
+      request_id, 
+      surplus_id, 
+      company_id, 
+      organization_id, 
+      reserved_at, 
+      reservation_status
+    ) VALUES ($1, $2, $3, $4, $5, $6)
+    RETURNING *
+  `
+   return await database.one(query, [request_id, surplus_id, company_id, organization_id, reserved_at, status])
+  } catch(e) {
+    console.log(`err creating reservation: ${e}`)
+  }
+}
+
+export async function modifyStatus(tableName, id, status, modify) {
   try {
     const query = 'UPDATE ${table:name} SET request_status = ${newStatus} WHERE request_id = ${idVal}'
     await database.none(query, {
@@ -23,9 +56,14 @@ export async function modifyStatus(tableName, id, status) {
       idVal: id
     })
 
-    return await fetchTables('requests', 'request_id', id)
+    const table = await fetchOneRecord('requests', 'request_id', id)
+    const { request_id, surplus_id, company_id, organization_id, created_at, request_status } = table
 
+    if (modify) {
+      return await createReservation(request_id, surplus_id, company_id, organization_id, created_at, request_status)
+    }
   } catch(e) {
     console.log(`err accepting request tables: ${e}`)
   }
 }
+
