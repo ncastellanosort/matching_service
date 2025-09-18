@@ -6,7 +6,6 @@ import swaggerDocs from './swagger.js'
 
 const PORT = process.env.PORT || 3000
 
-app.disable('x-powered-by')
 app.use(express.json())
 app.use('/requests', requestRouter)
 app.use('/reservations', reservationRouter)

@@ -3,10 +3,17 @@ import dotenv from 'dotenv'
 
 dotenv.config()
 
-const DATABASE_URL = process.env.URL_DATABASE
+const DATABASE_URL = process.env.AWS_RDS_URL
 const pgp = pgPromise()
 
-const database = pgp(DATABASE_URL)
+const conn = {
+  connectionString: DATABASE_URL,
+  ssl: {
+    rejectUnauthorized: false
+  }
+}
+
+const database = pgp(conn)
 
 export default database;
 

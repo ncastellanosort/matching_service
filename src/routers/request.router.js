@@ -3,8 +3,6 @@ import { fetchArrayOfRecords, modifyStatus, saveRequest } from '../services/data
 
 const requestRouter = Router()
 
-// get a catalog_service para traer todo los excedentes publicados por las empresas
-
 /**
  * @openapi
  * /requests:
