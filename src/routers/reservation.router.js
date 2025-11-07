@@ -22,7 +22,7 @@ const reservationRouter = Router()
 reservationRouter.get('/company/:companyId', async function(req, res) {
   const { companyId } = req.params
 
-  const requests = await fetchArrayOfRecords('reservations', 'company_id', companyId) 
+  const requests = await fetchArrayOfRecords('users', companyId, 'company') 
   res.json(requests)
 })
 
@@ -45,7 +45,7 @@ reservationRouter.get('/company/:companyId', async function(req, res) {
 reservationRouter.get('/organization/:organizationId', async function(req, res) {
   const { organizationId } = req.params
 
-  const requests = await fetchArrayOfRecords('reservations', 'organization_id', organizationId) 
+  const requests = await fetchArrayOfRecords('users', organizationId, 'organization') 
   res.json(requests)
 })
 

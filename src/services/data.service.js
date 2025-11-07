@@ -8,6 +8,14 @@ export async function fetchArrayOfRecords(tableName, idName ,idValue) {
   }
 }
 
+export async function fetchReservations(tableName, idValue, companyType) {
+  try {
+    return await supabase.from(tableName).select('*').eq('id', idValue).eq('user_type', companyType);
+  } catch(e) {
+    console.log(`err fetching reservations: ${e}`)
+  }
+}
+
 export async function getRequests(user_id) {
   try {
     const { data } = await supabase.from('requests').select('*').eq('user_id', user_id);
