@@ -19,11 +19,14 @@ const reservationRouter = Router()
  *       200:
  *         description: Lista de reservas de la empresa
  */
-reservationRouter.get('/company/:companyId', async function(req, res) {
-  const { companyId } = req.params
-
-  const requests = await fetchArrayOfRecords('users', companyId, 'company') 
-  res.json(requests)
+reservationRouter.get('/company/:companyId', async function(req, res, next) {
+  try {
+    const { companyId } = req.params
+    const requests = await fetchArrayOfRecords('users', companyId, 'company') 
+    res.json(requests)
+  } catch (e) {
+    next(e)
+  }
 })
 
 /**
@@ -42,11 +45,14 @@ reservationRouter.get('/company/:companyId', async function(req, res) {
  *       200:
  *         description: Lista de reservas de la organización
  */
-reservationRouter.get('/organization/:organizationId', async function(req, res) {
-  const { organizationId } = req.params
-
-  const requests = await fetchArrayOfRecords('users', organizationId, 'organization') 
-  res.json(requests)
+reservationRouter.get('/organization/:organizationId', async function(req, res, next) {
+  try {
+    const { organizationId } = req.params
+    const requests = await fetchArrayOfRecords('users', organizationId, 'organization') 
+    res.json(requests)
+  } catch (e) {
+    next(e);
+  }
 })
 
 export default reservationRouter;

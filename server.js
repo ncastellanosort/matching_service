@@ -10,6 +10,17 @@ app.use(express.json())
 app.use('/requests', requestRouter)
 app.use('/reservations', reservationRouter)
 
+app.use((err, req, res, next) => {
+  console.error('error:', err.message)
+
+  const status = err.status || 500
+
+  res.status(status).json({
+    success: false,
+    message: err.message || 'internal server error',
+  })
+})
+
 swaggerDocs(app, PORT)
 
 app.listen(PORT)

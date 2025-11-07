@@ -1,5 +1,5 @@
 import { Router } from 'express'
-import { fetchArrayOfRecords, getRequests, modifyStatus, saveRequest } from '../services/data.service.js'
+import { getRequests, modifyStatus, saveRequest } from '../services/data.service.js'
 
 const requestRouter = Router()
 
@@ -31,9 +31,13 @@ const requestRouter = Router()
  *       200:
  *         description: Solicitud creada exitosamente
  */
-requestRouter.post('/', async function(req, res) {
-  const postResponse = await saveRequest(req.body)
-  res.json(postResponse)
+requestRouter.post('/', async function (req, res, next) {
+  try {
+    const postResponse = await saveRequest(req.body)
+    res.json(postResponse)
+  } catch (err) {
+    next(err)
+  }
 })
 
 /**
@@ -52,10 +56,14 @@ requestRouter.post('/', async function(req, res) {
  *       200:
  *         description: Lista de solicitudes de la empresa
  */
-requestRouter.get('/company/:companyId', async function(req, res) {
-  const { companyId } = req.params
-  const requests = await getRequests(companyId);
-  res.json(requests)
+requestRouter.get('/company/:companyId', async function (req, res, next) {
+  try {
+    const { companyId } = req.params
+    const requests = await getRequests(companyId)
+    res.json(requests)
+  } catch (err) {
+    next(err)
+  }
 })
 
 /**
@@ -74,11 +82,14 @@ requestRouter.get('/company/:companyId', async function(req, res) {
  *       200:
  *         description: Solicitud actualizada como aceptada
  */
-requestRouter.patch('/:requestId/accept', async function(req, res) {
-  const { requestId } = req.params
-  const requests = await modifyStatus(requestId, 'accepted', true)
-
-  res.json(requests)
+requestRouter.patch('/:requestId/accept', async function (req, res, next) {
+  try {
+    const { requestId } = req.params
+    const requests = await modifyStatus(requestId, 'accepted', true)
+    res.json(requests)
+  } catch (err) {
+    next(err)
+  }
 })
 
 /**
@@ -97,11 +108,14 @@ requestRouter.patch('/:requestId/accept', async function(req, res) {
  *       200:
  *         description: Solicitud actualizada como rechazada
  */
-requestRouter.patch('/:requestId/reject', async function(req, res) {
-  const { requestId } = req.params
-  const requests = await modifyStatus(requestId, 'rejected', false)
-
-  res.json(requests)
+requestRouter.patch('/:requestId/reject', async function (req, res, next) {
+  try {
+    const { requestId } = req.params
+    const requests = await modifyStatus(requestId, 'rejected', false)
+    res.json(requests)
+  } catch (err) {
+    next(err)
+  }
 })
 
 export default requestRouter;
