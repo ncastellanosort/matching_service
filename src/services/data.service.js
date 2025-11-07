@@ -1,66 +1,54 @@
-import database from '../db/db.js'
+import { supabase } from '../db/db.js';
 
 export async function fetchArrayOfRecords(tableName, idName ,idValue) {
   try {
-    const query = 'SELECT * FROM ${table:name} WHERE ${idCol:name} = ${idVal}';
-    const requests = await database.any(query, {
-      table: tableName,
-      idCol: idName,
-      idVal: idValue
-    });
-    return requests;
+    return await supabase.from(tableName).select('*').eq(idName, idValue);
   } catch(e) {
     console.log(`err fetching tables: ${e}`)
+  }
+}
+
+export async function getRequests(user_id) {
+  try {
+    const { data } = await supabase.from('requests').select('*').eq('user_id', user_id);
+    return data;
+  } catch (e) {
+    console.log(`err fetching requests where by company_id: ${e}`)
   }
 }
 
 export async function fetchOneRecord(tableName, idName ,idValue) {
   try {
-    const query = 'SELECT * FROM ${table:name} WHERE ${idCol:name} = ${idVal}';
-    const requests = await database.oneOrNone(query, {
-      table: tableName,
-      idCol: idName,
-      idVal: idValue
-    });
-    return requests;
+    return await supabase.from(tableName).select('*').eq(idName, idValue).single();
   } catch(e) {
-    console.log(`err fetching tables: ${e}`)
+    console.log(`err fetching one record: ${e}`)
   }
 }
 
-export async function createReservation(table) {
-    const { request_id, surplus_id, company_id, organization_id, created_at, request_status } = table
+export async function createReservation(request) {
+  const { surplus_id, user_id } = request
+  const reservation = {
+    surplus_id: surplus_id,
+    user_id: user_id,
+    reservation_status: 'in process',
+
+  };
+  console.log(reservation);
   try {
-    const query = `
-    INSERT INTO reservations(
-      request_id, 
-      surplus_id, 
-      company_id, 
-      organization_id, 
-      reserved_at, 
-      reservation_status
-    ) VALUES ($1, $2, $3, $4, $5, $6)
-    RETURNING *
-  `
-   return await database.one(query, [request_id, surplus_id, company_id, organization_id, created_at, request_status])
+    return await supabase.from('reservations').insert(reservation).select();
   } catch(e) {
     console.log(`err creating reservation: ${e}`)
   }
 }
 
-export async function modifyStatus(tableName, id, status, modify) {
+export async function modifyStatus(id, status, modify) {
   try {
-    const query = 'UPDATE ${table:name} SET request_status = ${newStatus} WHERE request_id = ${idVal}'
-    await database.none(query, {
-      table: tableName,
-      newStatus: status,
-      idVal: id
-    })
+    await supabase.from('requests').update({ request_status: status }).eq('id', id);
 
-    const table = await fetchOneRecord('requests', 'request_id', id)
+    const { data } = await fetchOneRecord('requests', 'id', id)
 
     if (modify) {
-      return await createReservation(table)
+      return await createReservation(data)
     }
   } catch(e) {
     console.log(`err accepting request tables: ${e}`)
@@ -69,20 +57,7 @@ export async function modifyStatus(tableName, id, status, modify) {
 
 export async function saveRequest(body) {
   try {
-    const query = `INSERT INTO requests(
-      surplus_id,
-      company_id,
-      organization_id,
-      message,
-      request_status,
-      created_at
-    ) VALUES ($1, $2, $3, $4, $5, $6)
-    RETURNING *
-    `
-    const { surplus_id, company_id, organization_id, message } = body
-
-    const todayDate = new Date().toISOString()
-    return await database.one(query, [surplus_id, company_id, organization_id, message, "pending", todayDate])
+    return await supabase.from('requests').insert(body).single();
   } catch(e){
     console.log(`err saving request: ${e}`)
   } 

@@ -1,5 +1,5 @@
 import { Router } from 'express'
-import { fetchArrayOfRecords, modifyStatus, saveRequest } from '../services/data.service.js'
+import { fetchArrayOfRecords, getRequests, modifyStatus, saveRequest } from '../services/data.service.js'
 
 const requestRouter = Router()
 
@@ -18,15 +18,15 @@ const requestRouter = Router()
  *               surplus_id:
  *                 type: integer
  *                 example: 5
- *               company_id:
+ *               user_id:
  *                 type: integer
  *                 example: 2
- *               organization_id:
- *                 type: integer
- *                 example: 7
  *               message:
  *                 type: string
  *                 example: "Nos interesa este excedente"
+ *               request_status:
+ *                 type: string
+ *                 example: "pending"
  *     responses:
  *       200:
  *         description: Solicitud creada exitosamente
@@ -54,8 +54,7 @@ requestRouter.post('/', async function(req, res) {
  */
 requestRouter.get('/company/:companyId', async function(req, res) {
   const { companyId } = req.params
-
-  const requests = await fetchArrayOfRecords('requests', 'company_id', companyId) 
+  const requests = await getRequests(companyId);
   res.json(requests)
 })
 
@@ -77,7 +76,7 @@ requestRouter.get('/company/:companyId', async function(req, res) {
  */
 requestRouter.patch('/:requestId/accept', async function(req, res) {
   const { requestId } = req.params
-  const requests = await modifyStatus('requests', requestId, 'accepted', true)
+  const requests = await modifyStatus(requestId, 'accepted', true)
 
   res.json(requests)
 })
@@ -100,7 +99,7 @@ requestRouter.patch('/:requestId/accept', async function(req, res) {
  */
 requestRouter.patch('/:requestId/reject', async function(req, res) {
   const { requestId } = req.params
-  const requests = await modifyStatus('requests', requestId, 'rejected', false)
+  const requests = await modifyStatus(requestId, 'rejected', false)
 
   res.json(requests)
 })
