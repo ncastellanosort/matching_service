@@ -1,19 +1,11 @@
-import pgPromise from 'pg-promise'
 import dotenv from 'dotenv'
 
 dotenv.config()
 
-const DATABASE_URL = process.env.AWS_RDS_URL
-const pgp = pgPromise()
+const SUPABASE_URL = process.env.SUPABASE_URL
+const SUPABASE_API_KEY = process.env.SUPABASE_API_KEY
 
-const conn = {
-  connectionString: DATABASE_URL,
-  ssl: {
-    rejectUnauthorized: false
-  }
-}
+import { createClient } from '@supabase/supabase-js'
 
-const database = pgp(conn)
-
-export default database;
+export const supabase = createClient(SUPABASE_URL,SUPABASE_API_KEY)
 
