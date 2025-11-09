@@ -4,7 +4,7 @@ import { getRequests, modifyStatus, saveRequest } from '../services/data.service
 import { jwtConstants } from '../constants.js';
 
 const requestRouter = Router()
-const secreKey = jwtConstants.SECRET_KEY;
+const secretKey = jwtConstants.SECRET_KEY;
 
 /**
  * @openapi
@@ -35,7 +35,7 @@ requestRouter.post('/', async function (req, res, next) {
   const token = req.header('authorization').split(" ")[1];
   if (!token) res.status(401).json({ message: "no token provided" });
   try {
-    const { user } = jwt.verify(token, secreKey)
+    const { user } = jwt.verify(token, secretKey)
     const postResponse = await saveRequest(req.body, user)
     res.json(postResponse)
   } catch (err) {
