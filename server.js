@@ -4,7 +4,7 @@ import requestRouter from './src/routers/request.router.js'
 import reservationRouter from './src/routers/reservation.router.js'
 import swaggerDocs from './swagger.js'
 
-const PORT = process.env.PORT || 3000
+const PORT = process.env.PORT || 3001
 
 app.use(express.json())
 app.use('/requests', requestRouter)

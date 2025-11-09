@@ -1,7 +1,10 @@
+import jwt from 'jsonwebtoken';
 import { Router } from 'express'
 import { getRequests, modifyStatus, saveRequest } from '../services/data.service.js'
+import { jwtConstants } from '../constants.js';
 
 const requestRouter = Router()
+const secreKey = jwtConstants.SECRET_KEY;
 
 /**
  * @openapi
@@ -18,9 +21,6 @@ const requestRouter = Router()
  *               surplus_id:
  *                 type: integer
  *                 example: 5
- *               user_id:
- *                 type: integer
- *                 example: 2
  *               message:
  *                 type: string
  *                 example: "Nos interesa este excedente"
@@ -32,8 +32,11 @@ const requestRouter = Router()
  *         description: Solicitud creada exitosamente
  */
 requestRouter.post('/', async function (req, res, next) {
+  const token = req.header('authorization').split(" ")[1];
+  if (!token) res.status(401).json({ message: "no token provided" });
   try {
-    const postResponse = await saveRequest(req.body)
+    const { user } = jwt.verify(token, secreKey)
+    const postResponse = await saveRequest(req.body, user)
     res.json(postResponse)
   } catch (err) {
     next(err)

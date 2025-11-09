@@ -90,13 +90,14 @@ export async function modifyStatus(id, status, modify) {
   }
 }
 
-export async function saveRequest(body) {
+export async function saveRequest(body, user) {
   try {
-    const { data, error } = await supabase.from('requests').insert(body).single();
+    const newBody = {...body, user_id: user.id}
+    const { data, error } = await supabase.from('requests').insert(newBody);
     if (error) throw new Error(error.message);
-    return data;
+    return { inserted: true, body: newBody };
   } catch (e) {
-    console.error(`Error saving request: ${e.message}`);
+    console.error(`error saving request: ${e.message}`);
     throw e;
   }
 }
